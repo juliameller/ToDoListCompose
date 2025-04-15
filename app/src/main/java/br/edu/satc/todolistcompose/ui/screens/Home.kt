@@ -44,9 +44,8 @@ import br.edu.satc.todolistcompose.ui.components.TaskCard
 import kotlinx.coroutines.launch
 
 
-@Preview(showBackground = true)
 @Composable
-fun HomeScreen() {
+fun HomeScreen(tasks: List<TaskData>, onAddTask: (TaskData) -> Unit) {
 
     // states by remember
     // Guardam valores importantes de controle em nossa home
@@ -119,19 +118,22 @@ fun HomeScreen() {
          * O que aparece no "meio".
          * Para ficar mais organizado, montei o conteúdo em functions separadas.
          * */
-        HomeContent(innerPadding)
-        NewTask(showBottomSheet = showBottomSheet) { showBottomSheet = false }
+        HomeContent(innerPadding, tasks)
+        NewTask(showBottomSheet = showBottomSheet) { newTask ->
+            onAddTask(newTask)
+            showBottomSheet = false
+        }
 
     }
 }
 
 @Composable
-fun HomeContent(innerPadding: PaddingValues) {
+fun HomeContent(innerPadding: PaddingValues, tasks: List<TaskData>) {
 
-    val tasks = mutableListOf<TaskData>()
-    for (i in 0..5) {
-        tasks.add(TaskData("Tarefa " + i, "Descricao " + i, i % 2 == 0))
-    }
+//    val tasks = mutableListOf<TaskData>()
+//    for (i in 0..5) {
+//        tasks.add(TaskData("Tarefa " + i, "Descricao " + i, i % 2 == 0))
+//    }
 
     /**
      * Aqui simplesmente temos uma Column com o nosso conteúdo.
@@ -161,6 +163,7 @@ fun HomeContent(innerPadding: PaddingValues) {
  * NewTask abre uma janela estilo "modal". No Android conhecida por BottomSheet.
  * Aqui podemos "cadastrar uma nova Task".
  */
+
 @Composable
 fun NewTask(showBottomSheet: Boolean, onComplete: () -> Unit) {
     val sheetState = rememberModalBottomSheetState()
@@ -199,6 +202,9 @@ fun NewTask(showBottomSheet: Boolean, onComplete: () -> Unit) {
                 Button(modifier = Modifier.padding(top = 4.dp), onClick = {
                     scope.launch { sheetState.hide() }.invokeOnCompletion {
                         if (!sheetState.isVisible) {
+                            TaskData(
+                                id=0,title ="Titulo", description ="Descrição", complete =true
+                            )
                             onComplete()
                         }
                     }
